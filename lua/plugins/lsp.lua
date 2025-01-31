@@ -10,7 +10,7 @@ return {
 		"williamboman/mason-lspconfig.nvim",
 		config = function()
 			require("mason-lspconfig").setup({
-				ensure_installed = { "lua_ls", "ts_ls", "phpactor" },
+				ensure_installed = { "lua_ls", "ts_ls", "phpactor", "tailwindcss", "jdtls" },
 			})
 		end,
 	},
@@ -21,6 +21,8 @@ return {
 			lspconfig.lua_ls.setup({})
 			lspconfig.ts_ls.setup({})
 			lspconfig.phpactor.setup({})
+			lspconfig.tailwindcss.setup({})
+			lspconfig.jdtls.setup({})
 
 			vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Documentation" })
 			vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code Actions" })
