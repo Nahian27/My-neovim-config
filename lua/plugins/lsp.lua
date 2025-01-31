@@ -8,21 +8,55 @@ return {
 	},
 	{
 		"williamboman/mason-lspconfig.nvim",
+		dependencies = {
+			"folke/lazydev.nvim",
+			ft = "lua", -- only load on lua files
+			opts = {
+				library = {
+					-- See the configuration section for more details
+					-- Load luvit types when the `vim.uv` word is found
+					{ path = "${3rd}/luv/library", words = { "vim%.uv" } },
+				},
+			},
+		},
 		config = function()
 			require("mason-lspconfig").setup({
-				ensure_installed = { "lua_ls", "ts_ls", "phpactor", "tailwindcss", "jdtls" },
+				ensure_installed = { "lua_ls", "ts_ls", "phpactor", "tailwindcss", "jdtls", "intelephense" },
+			})
+		end,
+	},
+	{
+		"nvimtools/none-ls.nvim",
+		config = function()
+			local null_ls = require("null-ls")
+
+			null_ls.setup({
+				sources = {
+					null_ls.builtins.formatting.stylua,
+					--null_ls.builtins.completion.spell,
+					--require("none-ls.diagnostics.eslint"), -- requires none-ls-extras.nvim
+				},
 			})
 		end,
 	},
 	{
 		"neovim/nvim-lspconfig",
-		config = function()
+		dependencies = { "saghen/blink.cmp" },
+		opts = {
+			servers = {
+				lua_ls = {},
+				ts_ls = {},
+				tailwindcss = {},
+				jdtls = {},
+				intelephense = {},
+			},
+		},
+		config = function(_, opts)
 			local lspconfig = require("lspconfig")
-			lspconfig.lua_ls.setup({})
-			lspconfig.ts_ls.setup({})
-			lspconfig.phpactor.setup({})
-			lspconfig.tailwindcss.setup({})
-			lspconfig.jdtls.setup({})
+			for server, config in pairs(opts.servers) do
+				config.capabilities = require("blink.cmp").get_lsp_capabilities(config.capabilities)
+				lspconfig[server].setup(config)
+			end
 
 			vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Documentation" })
 			vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code Actions" })
